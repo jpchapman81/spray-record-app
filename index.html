@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Julius Ag Spray Record</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, select, textarea { margin: 5px 0; padding: 8px; width: 100%; }
+    button { padding: 10px 20px; margin-top: 15px; }
+    .signature-box { border: 1px solid #000; height: 150px; }
+    canvas { width: 100%; height: 150px; border: 1px solid black; }
+  </style>
+</head>
+<body>
+
+<h2>Julius Ag Spray Record</h2>
+
+<form id="sprayForm">
+
+  <label>Job Number:</label>
+  <input type="text" id="jobNumber" readonly>
+
+  <label>Date:</label>
+  <input type="date" id="date" required>
+
+  <label>Location:</label>
+  <input type="text" id="location" required>
+
+  <label>Tank Mix:</label>
+  <select id="tankMix" required>
+    <option value="">Select Mix</option>
+    <option value="Esplanade Mix">Esplanade + Antares + Roundup</option>
+    <option value="Trumpcard Mix">Trumpcard + Vision + Induce</option>
+    <option value="Milestone Mix">Milestone + Telar + Trumpcard</option>
+  </select>
+
+  <label>Chemicals Used (autofilled):</label>
+  <textarea id="chemicals" readonly></textarea>
+
+  <label>Acres Treated:</label>
+  <input type="number" id="acres" min="0" step="0.01" required>
+
+  <label>Chemical Cost ($):</label>
+  <input type="text" id="chemicalCost" readonly>
+
+  <label>Applicators:</label>
+  <input type="text" id="applicators" required>
+
+  <label>Weather Conditions:</label>
+  <input type="text" id="weather" required>
+
+  <label>GPS Coordinates:</label>
+  <input type="text" id="gps" placeholder="e.g., 39.5000, -107.8000" required>
+
+  <h3>Signature:</h3>
+  <canvas id="signatureCanvas"></canvas>
+  <button type="button" onclick="clearSignature()">Clear Signature</button>
+
+  <br><br>
+  <button type="button" onclick="submitForm()">Submit Record</button>
+
+</form>
+
+<script>
+  let jobCounter = 1000;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('jobNumber').value = jobCounter;
+  });
+
+  document.getElementById('tankMix').addEventListener('change', function() {
+    const mix = this.value;
+    let chemicals = '';
+    if (mix === 'Esplanade Mix') {
+      chemicals = "Esplanade 432-1516: 5 oz\nAntares Pro 82534-5-5905: 10 oz\nRoundup Pro 524-529: 64 oz\nGrounded: 32 oz\nDye: 32 oz";
+    } else if (mix === 'Trumpcard Mix') {
+      chemicals = "TrumpCard 5905-581: 48 oz\nVision 5905-576: 13 oz\nInduce: 20.48 oz\nDye: 16 oz";
+    } else if (mix === 'Milestone Mix') {
+      chemicals = "TrumpCard 5905-581: 48 oz\nMilestone 62719-519: 6 oz\nTelar 264-770: 1 oz\nInduce: 20.48 oz\nDye: 16 oz";
+    }
+    document.getElementById('chemicals').value = chemicals;
+  });
+
+  document.getElementById('acres').addEventListener('input', function() {
+    const acres = parseFloat(this.value);
+    if (!isNaN(acres)) {
+      const baseCost = 25.00; // Example base chemical cost
+      document.getElementById('chemicalCost').value = (baseCost * acres).toFixed(2);
+    }
+  });
+
+  function submitForm() {
+    const form = document.getElementById('sprayForm');
+    if (!form.checkValidity()) {
+      alert('Please fill all required fields.');
+      return;
+    }
+
+    const newWindow = window.open('', '', 'width=800,height=1000');
+    newWindow.document.write('<html><head><title>Spray Record</title></head><body>');
+    newWindow.document.write('<h2>Julius Ag Spray Record</h2>');
+    newWindow.document.write('<p><strong>Job Number:</strong> ' + document.getElementById('jobNumber').value + '</p>');
+    newWindow.document.write('<p><strong>Date:</strong> ' + document.getElementById('date').value + '</p>');
+    newWindow.document.write('<p><strong>Location:</strong> ' + document.getElementById('location').value + '</p>');
+    newWindow.document.write('<p><strong>Tank Mix:</strong> ' + document.getElementById('tankMix').value + '</p>');
+    newWindow.document.write('<pre>' + document.getElementById('chemicals').value + '</pre>');
+    newWindow.document.write('<p><strong>Acres Treated:</strong> ' + document.getElementById('acres').value + '</p>');
+    newWindow.document.write('<p><strong>Chemical Cost ($):</strong> ' + document.getElementById('chemicalCost').value + '</p>');
+    newWindow.document.write('<p><strong>Applicators:</strong> ' + document.getElementById('applicators').value + '</p>');
+    newWindow.document.write('<p><strong>Weather:</strong> ' + document.getElementById('weather').value + '</p>');
+    newWindow.document.write('<p><strong>GPS Coordinates:</strong> ' + document.getElementById('gps').value + '</p>');
+    newWindow.document.write('<p><strong>Signature:</strong><br><img src="' + signaturePad.toDataURL() + '" width="300"></p>');
+    newWindow.document.write('</body></html>');
+    newWindow.document.close();
+    newWindow.print();
+
+    // Increment Job Number for next record
+    jobCounter++;
+    document.getElementById('jobNumber').value = jobCounter;
+    form.reset();
+    clearSignature();
+  }
+
+  function clearSignature() {
+    const canvas = document.getElementById('signatureCanvas');
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  const signaturePad = (() => {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', e => {
+      drawing = true;
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (drawing) {
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
+
+    return {
+      toDataURL: () => canvas.toDataURL()
+    };
+  })();
+
+</script>
+
+</body>
+</html>
