@@ -27,6 +27,7 @@
     <option value="American Soda LLC">American Soda LLC</option>
     <option value="QB Energy">QB Energy</option>
     <option value="Other">Other</option>
+    onchange="toggleCustomCompany()"
   </select>
 
   <div id="customCompanyContainer" style="display:none;">
@@ -133,14 +134,30 @@
       return;
     }
 
+  let company = document.getElementById("company").value;
+    if (company === "Other") {
+  company = document.getElementById("customCompany").value || "Other";
+}
+  const ownership = document.getElementById("ownership").value;
+  const sprayer = document.getElementById("sprayerType").value;
+  const rate = parseInt(document.getElementById("calibrationRate").value, 10);
+  const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
+  const acresTreated = (gallons / rate).toFixed(2);
+
+
     const newWindow = window.open('', '', 'width=800,height=1000');
     newWindow.document.write('<html><head><title>Spray Record</title></head><body>');
     newWindow.document.write('<h2>Julius Ag Spray Record</h2>');
     newWindow.document.write('<p><strong>Job Number:</strong> ' + document.getElementById('jobNumber').value + '</p>');
     newWindow.document.write('<p><strong>Date:</strong> ' + document.getElementById('date').value + '</p>');
+    newWindow.document.write('<p><strong>Company:</strong> ' + company + '</p>');
     newWindow.document.write('<p><strong>Location:</strong> ' + document.getElementById('location').value + '</p>');
+    newWindow.document.write('<p><strong>Ownership:</strong> ' + ownership + '</p>');
     newWindow.document.write('<p><strong>Tank Mix:</strong> ' + document.getElementById('tankMix').value + '</p>');
     newWindow.document.write('<pre>' + document.getElementById('chemicals').value + '</pre>');
+    newWindow.document.write('<p><strong>Sprayer Type:</strong> ' + sprayer + '</p>');
+    newWindow.document.write('<p><strong>Calibration Rate (gal/acre):</strong> ' + rate + '</p>');
+    newWindow.document.write('<p><strong>Gallons Applied:</strong> ' + gallons + '</p>');
     newWindow.document.write('<p><strong>Acres Treated:</strong> ' + acresTreated + '</p>');
     newWindow.document.write('<p><strong>Chemical Cost ($):</strong> ' + document.getElementById('chemicalCost').value + '</p>');
     newWindow.document.write('<p><strong>Applicators:</strong> ' + document.getElementById('applicators').value + '</p>');
