@@ -22,9 +22,6 @@
   <label>Date:</label>
   <input type="date" id="date" required>
 
-  <label>Location:</label>
-  <input type="text" id="location" required>
-
   <label>Company:</label>
   <select id="company" onchange="toggleCustomCompany()" required>
     <option value="">Select Company</option>
@@ -37,6 +34,9 @@
     <label>Enter Custom Company Name:</label>
     <input type="text" id="customCompany">
   </div>
+
+  <label>Location:</label>
+  <input type="text" id="location" required>
 
   <label>Ownership:</label>
   <select id="ownership" required>
@@ -88,6 +88,8 @@
 
   <br><br>
   <button type="button" onclick="submitForm()">Submit Record</button>
+  <button type="button" onclick="clearForm()">Clear Record</button>
+
 
 </form>
 
@@ -172,15 +174,22 @@ function submitForm() {
   newWindow.document.close();
   newWindow.print();
 
-  // Increment job number
-  const jobInput = document.getElementById("jobNumber");
-  jobInput.value = parseInt(jobInput.value) + 1;
+   // Increment job number
+   const jobInput = document.getElementById("jobNumber");
+   jobInput.value = parseInt(jobInput.value) + 1;
 
-  // Reset form
-  document.getElementById("sprayForm").reset();
-  clearSignature();
-  toggleCustomCompany();
+   // Clear only the signature
+   clearSignature();
 }
+
+  function clearForm() {
+    const jobNumber = document.getElementById("jobNumber").value;
+    document.getElementById("sprayForm").reset();
+    document.getElementById("jobNumber").value = jobNumber;
+    clearSignature();
+    toggleCustomCompany();
+}
+
 </script>
 
 </body>
