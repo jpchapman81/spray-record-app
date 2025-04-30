@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <title>Julius Ag Spray Record</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+    body { font-family: Arial, sans-serif; margin: 20px; max-width: 600px; }
     input, select, textarea { margin: 5px 0; padding: 8px; width: 100%; }
     button { padding: 10px 20px; margin-top: 15px; }
-    .signature-box { border: 1px solid #000; height: 150px; }
     canvas { width: 100%; height: 150px; border: 1px solid black; }
   </style>
 </head>
@@ -18,22 +17,7 @@
 <form id="sprayForm">
 
   <label>Job Number:</label>
-  <input type="text" id="jobNumber" readonly>
-
-  <label>Company:</label>
-  <select id="company" required>
-    <option value="">Select Company</option>
-    <option value="Laramie Energy">Laramie Energy</option>
-    <option value="American Soda LLC">American Soda LLC</option>
-    <option value="QB Energy">QB Energy</option>
-    <option value="Other">Other</option>
-    onchange="toggleCustomCompany()"
-  </select>
-
-  <div id="customCompanyContainer" style="display:none;">
-    <label>Enter Custom Company Name:</label>
-    <input type="text" id="customCompany">
-  </div>
+  <input type="text" id="jobNumber" value="1000" readonly>
 
   <label>Date:</label>
   <input type="date" id="date" required>
@@ -41,24 +25,42 @@
   <label>Location:</label>
   <input type="text" id="location" required>
 
-<label>Ownership:</label>
-<select id="ownership" required>
-  <option value="">Select Ownership</option>
-  <option value="Private">Private</option>
-  <option value="BLM">BLM</option>
-  <option value="Forest Service">Forest Service</option>
-</select>
+  <label>Company:</label>
+  <select id="company" onchange="toggleCustomCompany()" required>
+    <option value="">Select Company</option>
+    <option value="Julius Ag">Julius Ag</option>
+    <option value="Steel Spur">Steel Spur</option>
+    <option value="Other">Other</option>
+  </select>
 
-<label>Sprayer Type:</label>
-<select id="sprayerType" required>
-  <option value="">Select Sprayer Type</option>
-  <option value="Backpack">Backpack</option>
-  <option value="ATV">ATV</option>
-  <option value="Truck Mount">Truck Mount</option>
-</select>
+  <div id="customCompanyContainer" style="display:none;">
+    <label>Enter Custom Company Name:</label>
+    <input type="text" id="customCompany">
+  </div>
+
+  <label>Ownership:</label>
+  <select id="ownership" required>
+    <option value="">Select Ownership</option>
+    <option value="Private">Private</option>
+    <option value="Public">Public</option>
+    <option value="Federal">Federal</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label>Sprayer Type:</label>
+  <select id="sprayerType" required>
+    <option value="">Select Sprayer Type</option>
+    <option value="Boom">Boom</option>
+    <option value="Backpack">Backpack</option>
+    <option value="ATV">ATV</option>
+    <option value="Truck Mount">Truck Mount</option>
+  </select>
 
   <label>Calibration Rate (gal/acre):</label>
-  <input type="number" id="calibrationRate" step="1" min="1" placeholder="e.g. 15" required>
+  <input type="number" id="calibrationRate" step="1" min="1" required>
+
+  <label>Gallons Applied:</label>
+  <input type="number" id="gallonsApplied" step="1" min="1" required>
 
   <label>Tank Mix:</label>
   <select id="tankMix" required>
@@ -68,14 +70,8 @@
     <option value="Milestone Mix">Milestone + Telar + Trumpcard</option>
   </select>
 
-  <label>Chemicals Used (autofilled):</label>
+  <label>Chemicals Used:</label>
   <textarea id="chemicals" readonly></textarea>
-
-  <label>Gallons Applied:</label>
-  <input type="number" id="gallonsApplied" min="1" step="1" required>
-
-  <label>Chemical Cost ($):</label>
-  <input type="text" id="chemicalCost" readonly>
 
   <label>Applicators:</label>
   <input type="text" id="applicators" required>
@@ -84,7 +80,7 @@
   <input type="text" id="weather" required>
 
   <label>GPS Coordinates:</label>
-  <input type="text" id="gps" placeholder="e.g., 39.5000, -107.8000" required>
+  <input type="text" id="gps" required>
 
   <h3>Signature:</h3>
   <canvas id="signatureCanvas"></canvas>
@@ -96,119 +92,6 @@
 </form>
 
 <script>
-  let jobCounter = 1000;
-
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('jobNumber').value = jobCounter;
-  });
-
-  document.getElementById('tankMix').addEventListener('change', function() {
-    const mix = this.value;
-    let chemicals = '';
-    if (mix === 'Esplanade Mix') {
-      chemicals = "Esplanade 432-1516: 5 oz\nAntares Pro 82534-5-5905: 10 oz\nRoundup Pro 524-529: 64 oz\nGrounded: 32 oz\nDye: 32 oz";
-    } else if (mix === 'Trumpcard Mix') {
-      chemicals = "TrumpCard 5905-581: 48 oz\nVision 5905-576: 13 oz\nInduce: 20.48 oz\nDye: 16 oz";
-    } else if (mix === 'Milestone Mix') {
-      chemicals = "TrumpCard 5905-581: 48 oz\nMilestone 62719-519: 6 oz\nTelar 264-770: 1 oz\nInduce: 20.48 oz\nDye: 16 oz";
-    }
-    document.getElementById('chemicals').value = chemicals;
-  });
-
-  document.getElementById('acres').addEventListener('input', function() {
-    const acres = parseFloat(this.value);
-    if (!isNaN(acres)) {
-      const baseCost = 25.00; // Example base chemical cost
-      document.getElementById('chemicalCost').value = (baseCost * acres).toFixed(2);
-    }
-  });
-
-  function submitForm() {
-    const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
-    const rate = parseInt(document.getElementById("calibrationRate").value, 10);
-    const acresTreated = (gallons / rate).toFixed(2);
-
-    const form = document.getElementById('sprayForm');
-    if (!form.checkValidity()) {
-      alert('Please fill all required fields.');
-      return;
-    }
-
-  let company = document.getElementById("company").value;
-    if (company === "Other") {
-  company = document.getElementById("customCompany").value || "Other";
-}
-  const ownership = document.getElementById("ownership").value;
-  const sprayer = document.getElementById("sprayerType").value;
-  const rate = parseInt(document.getElementById("calibrationRate").value, 10);
-  const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
-  const acresTreated = (gallons / rate).toFixed(2);
-
-
-    const newWindow = window.open('', '', 'width=800,height=1000');
-    newWindow.document.write('<html><head><title>Spray Record</title></head><body>');
-    newWindow.document.write('<h2>Julius Ag Spray Record</h2>');
-    newWindow.document.write('<p><strong>Job Number:</strong> ' + document.getElementById('jobNumber').value + '</p>');
-    newWindow.document.write('<p><strong>Date:</strong> ' + document.getElementById('date').value + '</p>');
-    newWindow.document.write('<p><strong>Company:</strong> ' + company + '</p>');
-    newWindow.document.write('<p><strong>Location:</strong> ' + document.getElementById('location').value + '</p>');
-    newWindow.document.write('<p><strong>Ownership:</strong> ' + ownership + '</p>');
-    newWindow.document.write('<p><strong>Tank Mix:</strong> ' + document.getElementById('tankMix').value + '</p>');
-    newWindow.document.write('<pre>' + document.getElementById('chemicals').value + '</pre>');
-    newWindow.document.write('<p><strong>Sprayer Type:</strong> ' + sprayer + '</p>');
-    newWindow.document.write('<p><strong>Calibration Rate (gal/acre):</strong> ' + rate + '</p>');
-    newWindow.document.write('<p><strong>Gallons Applied:</strong> ' + gallons + '</p>');
-    newWindow.document.write('<p><strong>Acres Treated:</strong> ' + acresTreated + '</p>');
-    newWindow.document.write('<p><strong>Chemical Cost ($):</strong> ' + document.getElementById('chemicalCost').value + '</p>');
-    newWindow.document.write('<p><strong>Applicators:</strong> ' + document.getElementById('applicators').value + '</p>');
-    newWindow.document.write('<p><strong>Weather:</strong> ' + document.getElementById('weather').value + '</p>');
-    newWindow.document.write('<p><strong>GPS Coordinates:</strong> ' + document.getElementById('gps').value + '</p>');
-    newWindow.document.write('<p><strong>Signature:</strong><br><img src="' + signaturePad.toDataURL() + '" width="300"></p>');
-    newWindow.document.write('</body></html>');
-    newWindow.document.close();
-    newWindow.print();
-
-    // Increment Job Number for next record
-    jobCounter++;
-    document.getElementById('jobNumber').value = jobCounter;
-    form.reset();
-    clearSignature();
-  }
-
-  function clearSignature() {
-    const canvas = document.getElementById('signatureCanvas');
-    const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  const signaturePad = (() => {
-    const canvas = document.getElementById('signatureCanvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-
-    canvas.addEventListener('mousedown', e => {
-      drawing = true;
-      ctx.moveTo(e.offsetX, e.offsetY);
-    });
-
-    canvas.addEventListener('mousemove', e => {
-      if (drawing) {
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-      }
-    });
-
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('mouseout', () => drawing = false);
-
-    return {
-      toDataURL: () => canvas.toDataURL()
-    };
-  })();
-
-</script>
-
-<script>
 function toggleCustomCompany() {
   const companySelect = document.getElementById("company");
   const customContainer = document.getElementById("customCompanyContainer");
@@ -216,8 +99,87 @@ function toggleCustomCompany() {
     customContainer.style.display = "block";
   } else {
     customContainer.style.display = "none";
-    document.getElementById("customCompany").value = ""; // Clear it
+    document.getElementById("customCompany").value = "";
   }
+}
+
+document.getElementById('tankMix').addEventListener('change', function() {
+  const mix = this.value;
+  let chemicals = '';
+  if (mix === 'Esplanade Mix') {
+    chemicals = "Esplanade 432-1516: 5 oz\nAntares Pro 82534-5-5905: 10 oz\nRoundup Pro 524-529: 64 oz\nGrounded: 32 oz\nDye: 32 oz";
+  } else if (mix === 'Trumpcard Mix') {
+    chemicals = "TrumpCard 5905-581: 48 oz\nVision 5905-576: 13 oz\nInduce: 20.48 oz\nDye: 16 oz";
+  } else if (mix === 'Milestone Mix') {
+    chemicals = "TrumpCard 5905-581: 48 oz\nMilestone 62719-519: 6 oz\nTelar 264-770: 1 oz\nInduce: 20.48 oz\nDye: 16 oz";
+  }
+  document.getElementById('chemicals').value = chemicals;
+});
+
+function clearSignature() {
+  const canvas = document.getElementById('signatureCanvas');
+  const context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+const signaturePad = (() => {
+  const canvas = document.getElementById('signatureCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  canvas.addEventListener('mousedown', e => {
+    drawing = true;
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    if (drawing) {
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    }
+  });
+
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseout', () => drawing = false);
+
+  return {
+    toDataURL: () => canvas.toDataURL()
+  };
+})();
+
+function submitForm() {
+  const companySelect = document.getElementById("company").value;
+  const customCompany = document.getElementById("customCompany").value;
+  const company = companySelect === "Other" ? (customCompany || "Other") : companySelect;
+  const ownership = document.getElementById("ownership").value;
+  const sprayer = document.getElementById("sprayerType").value;
+  const rate = parseInt(document.getElementById("calibrationRate").value, 10);
+  const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
+  const acresTreated = (gallons / rate).toFixed(2);
+
+  const newWindow = window.open('', '', 'width=800,height=1000');
+  newWindow.document.write('<html><body>');
+  newWindow.document.write('<h2>Julius Ag Spray Record</h2>');
+  newWindow.document.write('<p><strong>Company:</strong> ' + company + '</p>');
+  newWindow.document.write('<p><strong>Ownership:</strong> ' + ownership + '</p>');
+  newWindow.document.write('<p><strong>Sprayer Type:</strong> ' + sprayer + '</p>');
+  newWindow.document.write('<p><strong>Calibration Rate (gal/acre):</strong> ' + rate + '</p>');
+  newWindow.document.write('<p><strong>Gallons Applied:</strong> ' + gallons + '</p>');
+  newWindow.document.write('<p><strong>Acres Treated:</strong> ' + acresTreated + '</p>');
+  newWindow.document.write('<p><strong>Chemicals Used:</strong><br><pre>' + document.getElementById('chemicals').value + '</pre></p>');
+  newWindow.document.write('<p><strong>Signature:</strong><br><img src="' + signaturePad.toDataURL() + '" width="300"></p>');
+  newWindow.document.write('</body></html>');
+  newWindow.document.close();
+  newWindow.print();
+
+  // Increment job number
+  const jobInput = document.getElementById("jobNumber");
+  jobInput.value = parseInt(jobInput.value) + 1;
+
+  // Reset form
+  document.getElementById("sprayForm").reset();
+  clearSignature();
+  toggleCustomCompany();
 }
 </script>
 
