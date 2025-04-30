@@ -20,11 +20,44 @@
   <label>Job Number:</label>
   <input type="text" id="jobNumber" readonly>
 
+  <label>Company:</label>
+  <select id="company" required>
+    <option value="">Select Company</option>
+    <option value="Laramie Energy">Laramie Energy</option>
+    <option value="American Soda LLC">American Soda LLC</option>
+    <option value="QB Energy">QB Energy</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <div id="customCompanyContainer" style="display:none;">
+    <label>Enter Custom Company Name:</label>
+    <input type="text" id="customCompany">
+  </div>
+
   <label>Date:</label>
   <input type="date" id="date" required>
 
   <label>Location:</label>
   <input type="text" id="location" required>
+
+<label>Ownership:</label>
+<select id="ownership" required>
+  <option value="">Select Ownership</option>
+  <option value="Private">Private</option>
+  <option value="BLM">BLM</option>
+  <option value="Forest Service">Forest Service</option>
+</select>
+
+<label>Sprayer Type:</label>
+<select id="sprayerType" required>
+  <option value="">Select Sprayer Type</option>
+  <option value="Backpack">Backpack</option>
+  <option value="ATV">ATV</option>
+  <option value="Truck Mount">Truck Mount</option>
+</select>
+
+  <label>Calibration Rate (gal/acre):</label>
+  <input type="number" id="calibrationRate" step="1" min="1" placeholder="e.g. 15" required>
 
   <label>Tank Mix:</label>
   <select id="tankMix" required>
@@ -37,8 +70,8 @@
   <label>Chemicals Used (autofilled):</label>
   <textarea id="chemicals" readonly></textarea>
 
-  <label>Acres Treated:</label>
-  <input type="number" id="acres" min="0" step="0.01" required>
+  <label>Gallons Applied:</label>
+  <input type="number" id="gallonsApplied" min="1" step="1" required>
 
   <label>Chemical Cost ($):</label>
   <input type="text" id="chemicalCost" readonly>
@@ -90,6 +123,10 @@
   });
 
   function submitForm() {
+    const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
+    const rate = parseInt(document.getElementById("calibrationRate").value, 10);
+    const acresTreated = (gallons / rate).toFixed(2);
+
     const form = document.getElementById('sprayForm');
     if (!form.checkValidity()) {
       alert('Please fill all required fields.');
@@ -104,7 +141,7 @@
     newWindow.document.write('<p><strong>Location:</strong> ' + document.getElementById('location').value + '</p>');
     newWindow.document.write('<p><strong>Tank Mix:</strong> ' + document.getElementById('tankMix').value + '</p>');
     newWindow.document.write('<pre>' + document.getElementById('chemicals').value + '</pre>');
-    newWindow.document.write('<p><strong>Acres Treated:</strong> ' + document.getElementById('acres').value + '</p>');
+    newWindow.document.write('<p><strong>Acres Treated:</strong> ' + acresTreated + '</p>');
     newWindow.document.write('<p><strong>Chemical Cost ($):</strong> ' + document.getElementById('chemicalCost').value + '</p>');
     newWindow.document.write('<p><strong>Applicators:</strong> ' + document.getElementById('applicators').value + '</p>');
     newWindow.document.write('<p><strong>Weather:</strong> ' + document.getElementById('weather').value + '</p>');
@@ -152,6 +189,19 @@
     };
   })();
 
+</script>
+
+<script>
+function toggleCustomCompany() {
+  const companySelect = document.getElementById("company");
+  const customContainer = document.getElementById("customCompanyContainer");
+  if (companySelect.value === "Other") {
+    customContainer.style.display = "block";
+  } else {
+    customContainer.style.display = "none";
+    document.getElementById("customCompany").value = ""; // Clear it
+  }
+}
 </script>
 
 </body>
