@@ -64,11 +64,8 @@
   <input type="number" id="gallonsApplied" step="1" min="1" required>
 
   <label>Tank Mix:</label>
-  <select id="tankMix" required>
-    <option value="">Select Mix</option>
-    <option value="Esplanade Mix">Esplanade + Antares + Roundup</option>
-    <option value="Trumpcard Mix">Trumpcard + Vision + Induce</option>
-    <option value="Milestone Mix">Milestone + Telar + Trumpcard</option>
+  <select id="tankMix" onchange="updateChemicals()" required>
+    <option value="">Loading mixes...</option>
   </select>
 
   <label>Chemicals Used:</label>
@@ -189,6 +186,45 @@ function submitForm() {
     document.getElementById("jobNumber").value = jobNumber;
     clearSignature();
     toggleCustomCompany();
+}
+
+let tankMixData = [];
+
+fetch("https://opensheet.elk.sh/18G6oH9M5SrvJ2gCRLXQgvqB_8KO4qcYL5dUNZtw4VnM/Tank%20Mixes")
+  .then(res => res.json())
+  .then(data => {
+    tankMixData = data;
+    const tankMixSelect = document.getElementById("tankMix");
+    tankMixSelect.innerHTML = '<option value="">Select Mix</option>';
+    data.forEach(row => {
+      const opt = document.createElement("option");
+      opt.value = row.Name;
+      opt.textContent = row.Name;
+      tankMixSelect.appendChild(opt);
+    });
+  })
+  .catch(err => {
+    console.error("Error loading mixes:", err);
+    document.getElementById("tankMix").innerHTML = '<option value="">Error loading</option>';
+  });
+
+function updateChemicals() {
+  const selectedName = document.getElementById("tankMix").value;
+  const row = tankMixData.find(mix => mix.Name === selectedName);
+  if (!row) return;
+
+  let chemicalsText = '';
+  let i = 1;
+  while (row[`Chemical${i}`] || row[`Amount${i}`]) {
+    const chem = row[`Chemical${i}`] || '';
+    const amt = row[`Amount${i}`] || '';
+    if (chem || amt) {
+      chemicalsText += `${chem.trim()} — ${amt.trim()}\n`;
+    }
+    i++;
+  }
+
+  document.getElementById("chemicals").value = chemicalsText.trim();
 }
 
 </script>
