@@ -213,15 +213,14 @@ fetch("https://opensheet.elk.sh/18G6oH9M5SrvJ2gCRLXQgvqB_8KO4qcYL5dUNZtw4VnM/Tan
     const row = tankMixData.find(mix => mix.Name === selectedName);
     if (!row) return;
 
-    const tableHTML = ['<table border="1" cellpadding="6"><tr><th>Chemical</th><th>EPA #</th><th>Amount</th></tr>'];
+    const tableHTML = ['<table border="1" cellpadding="6"><tr><th>Chemical</th><th>Amount</th></tr>'];
 
     let i = 1;
-    while (row[`Chemical${i}`] || row[`Amount${i}`] || row[`EPA${i}`]) {
+    while (row[`Chemical${i}`] || row[`Amount${i}`]) {
       const chem = row[`Chemical${i}`] || '';
       const amt = row[`Amount${i}`] || '';
-      const epa = row[`EPA${i}`] || '';
-      if (chem || amt || epa) {
-        tableHTML.push(`<tr><td>${chem}</td><td>${epa}</td><td>${amt}</td></tr>`);
+      if (chem || amt) {
+        tableHTML.push(`<tr><td>${chem}</td><td>${amt}</td></tr>`);
       }
       i++;
     }
