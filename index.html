@@ -88,6 +88,32 @@
       margin-bottom: 12px;
     }
 
+  .print-record {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 30px;
+    color: #000;
+    max-width: 750px;
+    margin: auto;
+  }
+
+  .print-header {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+
+  .print-section {
+    margin-bottom: 18px;
+  }
+
+  .print-section label {
+    font-weight: bold;
+    display: inline-block;
+    width: 180px;
+  }
+
+
     </style>
 </head>
 
@@ -124,7 +150,7 @@
   <select id="ownership" required>
     <option value="">Select Ownership</option>
     <option value="Private">Private</option>
-    <option value="Public">Public</option>
+    <option value="BLM">BLM</option>
     <option value="Federal">Federal</option>
     <option value="Other">Other</option>
   </select>
@@ -267,20 +293,28 @@ function submitForm() {
   const acresTreated = (gallons / rate).toFixed(2);
 
   const newWindow = window.open('', '', 'width=800,height=1000');
-  newWindow.document.write('<html><body>');
-  newWindow.document.write('<h2>Julius Ag Spray Record</h2>');
-  newWindow.document.write('<p><strong>Company:</strong> ' + company + '</p>');
-  newWindow.document.write('<p><strong>Ownership:</strong> ' + ownership + '</p>');
-  newWindow.document.write('<p><strong>Sprayer Type:</strong> ' + sprayer + '</p>');
-  newWindow.document.write('<p><strong>Calibration Rate (gal/acre):</strong> ' + rate + '</p>');
-  newWindow.document.write('<p><strong>Gallons Applied:</strong> ' + gallons + '</p>');
-  newWindow.document.write('<p><strong>Acres Treated:</strong> ' + acresTreated + '</p>');
-  newWindow.document.write('<p><strong>Chemicals Used:</strong></p>');
+  newWindow.document.write('<html><head><title>Julius Ag Application Record</title></head><body>');
+  newWindow.document.write('<div class="print-record">');
+  newWindow.document.write('<div class="print-header">Application Record</div>');
+
+  newWindow.document.write('<div class="print-section"><label>Job Number:</label> ' + jobNumber + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Date:</label> ' + date + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Company:</label> ' + company + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Client Address:</label> ' + clientAddress + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Location:</label> ' + location + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Ownership:</label> ' + ownership + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Sprayer Type:</label> ' + sprayerType + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Gallons Applied:</label> ' + gallonsApplied + '</div>');
+  newWindow.document.write('<div class="print-section"><label>Calibration Rate:</label> ' + calibration + ' gal/acre</div>');
+  newWindow.document.write('<div class="print-section"><label>Acres Treated:</label> ' + acresTreated + '</div>');
+
+  newWindow.document.write('<div class="print-section"><strong>Chemicals Used:</strong></div>');
   newWindow.document.write(document.getElementById("chemicalsTableContainer").innerHTML);
-  newWindow.document.write('<p><strong>Signature:</strong><br><img src="' + signaturePad.toDataURL() + '" width="300"></p>');
-  newWindow.document.write('</body></html>');
-  newWindow.document.close();
-  newWindow.print();
+
+  newWindow.document.write('<div class="print-section"><label>Signature:</label><br>');
+  newWindow.document.write('<img src="' + signaturePad.toDataURL() + '" style="border:1px solid #000; width:300px; height:auto;" /></div>');
+
+  newWindow.document.write('</div></body></html>');
 
    // Increment job number
    const jobInput = document.getElementById("jobNumber");
