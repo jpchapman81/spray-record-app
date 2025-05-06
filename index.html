@@ -155,6 +155,24 @@
     <option value="Other">Other</option>
   </select>
 
+<label>Start Time:</label>
+<input type="time" id="startTime" required>
+
+<label>End Time:</label>
+<input type="time" id="endTime" required>
+
+<label>Temperature (°F):</label>
+<input type="number" id="temperature" required>
+
+<label>Humidity (%):</label>
+<input type="number" id="humidity" required>
+
+<label>Wind Speed (mph):</label>
+<input type="number" id="windSpeed" required>
+
+<label>Wind Direction:</label>
+<input type="text" id="windDirection" required>
+
   <label>Sprayer Type:</label>
   <select id="sprayerType" required>
     <option value="">Select Sprayer Type</option>
@@ -179,9 +197,6 @@
 
   <label>Applicators:</label>
   <input type="text" id="applicators" required>
-
-  <label>Weather Conditions:</label>
-  <input type="text" id="weather" required>
 
   <label>GPS Coordinates:</label>
   <input type="text" id="gps" required>
@@ -291,7 +306,6 @@ const signaturePad = (() => {
 })();
 
 function submitForm() {
-  // Grab values properly
   const jobNumber = document.getElementById("jobNumber").value;
   const date = document.getElementById("date").value;
 
@@ -307,39 +321,124 @@ function submitForm() {
   const calibration = parseInt(document.getElementById("calibrationRate").value, 10);
   const acresTreated = (gallonsApplied / calibration).toFixed(2);
 
-  // Create print window
+  const startTime = document.getElementById("startTime").value;
+  const endTime = document.getElementById("endTime").value;
+  const temperature = document.getElementById("temperature").value;
+  const humidity = document.getElementById("humidity").value;
+  const windSpeed = document.getElementById("windSpeed").value;
+  const windDirection = document.getElementById("windDirection").value;
+
   const newWindow = window.open('', '', 'width=800,height=1000');
-  newWindow.document.write('<html><head><title>Julius Ag Application Record</title></head><body>');
-  newWindow.document.write('<div class="print-record">');
-  newWindow.document.write('<div class="print-header">Application Record</div>');
+  newWindow.document.write('<html><head><title>Julius Ag Application Record</title><style>');
+  newWindow.document.write(`
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 40px;
+      color: #000;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section label {
+      font-weight: bold;
+      display: inline-block;
+      width: 180px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #ddd;
+    }
+    .signature {
+      margin-top: 40px;
+    }
+  `);
+  newWindow.document.write('</style></head><body>');
 
-  newWindow.document.write('<div class="print-section"><label>Job Number:</label> ' + jobNumber + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Date:</label> ' + date + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Company:</label> ' + company + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Client Address:</label> ' + clientAddress + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Location:</label> ' + location + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Ownership:</label> ' + ownership + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Sprayer Type:</label> ' + sprayerType + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Gallons Applied:</label> ' + gallonsApplied + '</div>');
-  newWindow.document.write('<div class="print-section"><label>Calibration Rate:</label> ' + calibration + ' gal/acre</div>');
-  newWindow.document.write('<div class="print-section"><label>Acres Treated:</label> ' + acresTreated + '</div>');
+  // Logo
+ newWindow.document.write('<div style="text-align:center;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAYAAAA+5+2cAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QgaEBMNSZPUPgAABARJREFUeNrt3dFx4jgYBuGv8Afw/5c4J/0GGIArxRthY5kKv2+vNeXAkRLZMmUgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwMPlFYY31Zrfalvb7L1xj1Zrb9/av1X2fHOi/XLaemz3tO/xC/ZV6XvmzVVZ3b/NuSpdHHo/kWbPntZX5X7abmz7tx+W+8pyu9mfZuW7yzNVaz3d92k9yf+X7Q/Nu8/WXHZr3+u8tyu3JtXef9Jc2/N+9V5v2/NftvL/XrZ68wW61bXyz0G/NdrZ+rdq71+au7uqdXGrfq7P/Fs9b6Y3Z7Xr67h/n28mzWaHvdf8un53ddrbbvX+w+Ov8LPv9ZH7Fubvk5uZlv5e+Z9W9w6W2v+Rbl+6ddQeau6Xz+dX8xO5Wu1vZ6W5et75q7uqlbxvqpR5qX5cvdf6Zu1vz7dvZWz9Pfzff3T84fZuzYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgfQfHlBXy7hskmZQAAAAASUVORK5CYII=" style="max-width:250px; margin-bottom:20px;"></div>');
 
-  newWindow.document.write('<div class="print-section"><strong>Chemicals Used:</strong></div>');
-  newWindow.document.write(document.getElementById("chemicalsTableContainer").innerHTML);
+  newWindow.document.write('<h1>Pesticide Application Record</h1>');
 
-  newWindow.document.write('<div class="print-section"><label>Signature:</label><br>');
+  // Section: Job Info
+  newWindow.document.write('<div class="section">');
+  newWindow.document.write('<label>Job Number:</label> ' + jobNumber + '<br>');
+  newWindow.document.write('<label>Date:</label> ' + date + '<br>');
+  newWindow.document.write('<label>Company:</label> ' + company + '<br>');
+  newWindow.document.write('<label>Client Address:</label> ' + clientAddress + '<br>');
+  newWindow.document.write('<label>Location:</label> ' + location + '<br>');
+  newWindow.document.write('<label>Ownership:</label> ' + ownership + '<br>');
+  newWindow.document.write('<label>Sprayer Type:</label> ' + sprayerType + '<br>');
+  newWindow.document.write('</div>');
+
+  // Section: Timing & Weather
+  newWindow.document.write('<div class="section">');
+  newWindow.document.write('<label>Start Time:</label> ' + startTime + '<br>');
+  newWindow.document.write('<label>End Time:</label> ' + endTime + '<br>');
+  newWindow.document.write('<label>Temperature:</label> ' + temperature + '°F<br>');
+  newWindow.document.write('<label>Humidity:</label> ' + humidity + '%<br>');
+  newWindow.document.write('<label>Wind Speed:</label> ' + windSpeed + ' mph<br>');
+  newWindow.document.write('<label>Wind Direction:</label> ' + windDirection + '<br>');
+  newWindow.document.write('</div>');
+
+  // Section: Application Rate
+  newWindow.document.write('<div class="section">');
+  newWindow.document.write('<label>Gallons Applied:</label> ' + gallonsApplied + '<br>');
+  newWindow.document.write('<label>Calibration Rate:</label> ' + calibration + ' gal/acre<br>');
+  newWindow.document.write('<label>Acres Treated:</label> ' + acresTreated + '<br>');
+  newWindow.document.write('</div>');
+
+  // Section: Chemicals Table
+  const selectedMixName = document.getElementById("tankMix").value;
+  const mix = tankMixes[selectedMixName];
+
+  newWindow.document.write('<div class="section"><h3>Herbicide/Adjuvant Usage</h3>');
+  newWindow.document.write('<table><tr><th>Chemical</th><th>Ounces per Acre</th><th>Total Used (oz)</th></tr>');
+
+  if (mix) {
+    for (let i = 1; i <= 6; i++) {
+      const chem = mix[`Chemical${i}`];
+      const oz = parseFloat(mix[`Amount${i}`]);
+      if (chem && oz) {
+        const totalUsed = ((gallonsApplied / calibration) * oz).toFixed(2);
+        newWindow.document.write(`<tr><td>${chem}</td><td>${oz}</td><td>${totalUsed}</td></tr>`);
+      }
+    }
+  }
+
+  newWindow.document.write('</table></div>');
+
+  // Signature
+  newWindow.document.write('<div class="signature"><strong>Signature:</strong><br><br>');
   newWindow.document.write('<img src="' + signaturePad.toDataURL() + '" style="border:1px solid #000; width:300px; height:auto;" /></div>');
 
-  newWindow.document.write('</div></body></html>');
+  newWindow.document.write('<p style="margin-top:20px;">Commercial Applicators are licensed by the Colorado Department of Agriculture</p>');
+  newWindow.document.write('</body></html>');
 
-  // Increment and save job number
-  let nextJob = parseInt(jobNumber) + 1;
-  document.getElementById("jobNumber").value = nextJob;
+  // Save and increment job #
+  const jobInput = document.getElementById("jobNumber");
+  let nextJob = parseInt(jobInput.value) + 1;
+  jobInput.value = nextJob;
   localStorage.setItem("jobNumber", nextJob);
 
-  // Clear only the signature
+  // Clear signature
   clearSignature();
 }
+
 
 
   function clearForm() {
