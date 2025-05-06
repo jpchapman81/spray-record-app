@@ -161,6 +161,12 @@
 <label>End Time:</label>
 <input type="time" id="endTime" required>
 
+<label>Hourly Rate ($):</label>
+<input type="number" id="hourlyRate" value="95">
+
+<label>Labor Cost ($):</label>
+<input type="text" id="laborCost" readonly>
+
 <label>Temperature (°F):</label>
 <input type="number" id="temperature" required>
 
@@ -321,8 +327,13 @@ function submitForm() {
   const calibration = parseInt(document.getElementById("calibrationRate").value, 10);
   const acresTreated = (gallonsApplied / calibration).toFixed(2);
 
+
   const startTime = document.getElementById("startTime").value;
   const endTime = document.getElementById("endTime").value;
+  const totalHours = parseFloat(document.getElementById("totalHours").value);
+  const rate = parseFloat(document.getElementById("hourlyRate").value);
+  const laborCost = (totalHours * rate).toFixed(2);
+  document.getElementById("laborCost").value = laborCost;
   const temperature = document.getElementById("temperature").value;
   const humidity = document.getElementById("humidity").value;
   const windSpeed = document.getElementById("windSpeed").value;
@@ -366,6 +377,15 @@ function submitForm() {
     .signature {
       margin-top: 40px;
     }
+    dl dt {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    dl dd {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+
   `);
   newWindow.document.write('</style></head><body>');
 
@@ -375,20 +395,23 @@ function submitForm() {
   newWindow.document.write('<h1>Pesticide Application Record</h1>');
 
   // Section: Job Info
-  newWindow.document.write('<div class="section">');
-  newWindow.document.write('<label>Job Number:</label> ' + jobNumber + '<br>');
-  newWindow.document.write('<label>Date:</label> ' + date + '<br>');
-  newWindow.document.write('<label>Company:</label> ' + company + '<br>');
-  newWindow.document.write('<label>Client Address:</label> ' + clientAddress + '<br>');
-  newWindow.document.write('<label>Location:</label> ' + location + '<br>');
-  newWindow.document.write('<label>Ownership:</label> ' + ownership + '<br>');
-  newWindow.document.write('<label>Sprayer Type:</label> ' + sprayerType + '<br>');
-  newWindow.document.write('</div>');
+    newWindow.document.write('<div class="section"><dl>');
+    newWindow.document.write(`<dt>Job Number:</dt><dd>${jobNumber}</dd>`);
+    newWindow.document.write(`<dt>Date:</dt><dd>${date}</dd>`);
+    newWindow.document.write(`<dt>Company:</dt><dd>${company}</dd>`);
+    newWindow.document.write(`<dt>Client Address:</dt><dd>${clientAddress}</dd>`);
+    newWindow.document.write(`<dt>Location:</dt><dd>${location}</dd>`);
+    newWindow.document.write(`<dt>Ownership:</dt><dd>${ownership}</dd>`);
+    newWindow.document.write(`<dt>Sprayer Type:</dt><dd>${sprayerType}</dd>`);
+    newWindow.document.write('</dl></div>');
 
   // Section: Timing & Weather
   newWindow.document.write('<div class="section">');
   newWindow.document.write('<label>Start Time:</label> ' + startTime + '<br>');
   newWindow.document.write('<label>End Time:</label> ' + endTime + '<br>');
+  newWindow.document.write('<label>Total Hours:</label> ' + totalHours + '<br>');
+  newWindow.document.write('<label>Hourly Rate:</label> $' + rate + '<br>');
+  newWindow.document.write('<label>Labor Cost:</label> $' + laborCost + '<br>');
   newWindow.document.write('<label>Temperature:</label> ' + temperature + '°F<br>');
   newWindow.document.write('<label>Humidity:</label> ' + humidity + '%<br>');
   newWindow.document.write('<label>Wind Speed:</label> ' + windSpeed + ' mph<br>');
