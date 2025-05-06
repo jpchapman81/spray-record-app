@@ -346,7 +346,6 @@ function submitForm() {
   const companySelect = document.getElementById("company").value;
   const customCompany = document.getElementById("customCompany").value;
   const company = companySelect === "Other" ? (customCompany || "Other") : companySelect;
-
   const clientAddress = document.getElementById("clientAddress").value;
   const location = document.getElementById("location").value;
   const ownership = document.getElementById("ownership").value;
@@ -380,58 +379,63 @@ function submitForm() {
   const applicators = document.getElementById("applicators").value;
   const gps = document.getElementById("gps").value;
 
-  const newWindow = window.open('', '', 'width=800,height=1000');
-  newWindow.document.write('<html><head><title>Julius Ag Application Record</title><style>');
+  const newWindow = window.open('', '', 'width=900,height=1200');
+  newWindow.document.write('<html><head><title>Application Record</title><style>');
   newWindow.document.write(\`
-    body { font-family: 'Segoe UI', sans-serif; margin: 30px; color: #000; }
-    h1 { text-align: center; }
-    .section { margin-top: 20px; }
-    .section label { display: inline-block; width: 200px; font-weight: bold; }
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { text-align: center; margin-bottom: 10px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+    td, th { border: 1px solid #000; padding: 8px; }
+    .section { margin-top: 20px; }
+    .label { font-weight: bold; width: 200px; display: inline-block; }
     .signature { margin-top: 30px; }
+    .logo { text-align: center; margin-bottom: 20px; }
   \`);
   newWindow.document.write('</style></head><body>');
 
-  newWindow.document.write('<div style="text-align:center;"><img src="https://via.placeholder.com/250x80?text=Julius+Ag+Logo" /></div>');
+  newWindow.document.write('<div class="logo"><img src="https://via.placeholder.com/250x80?text=Julius+Ag+Logo" /></div>');
   newWindow.document.write('<h1>Pesticide Application Record</h1>');
 
-  newWindow.document.write('<div class="section"><h3>Job Info</h3>');
+  newWindow.document.write('<div class="section"><h3>General Information</h3>');
   newWindow.document.write(\`
-    <label>Job Number:</label> \${jobNumber}<br>
-    <label>Date:</label> \${date}<br>
-    <label>Company:</label> \${company}<br>
-    <label>Client Address:</label> \${clientAddress}<br>
-    <label>Location:</label> \${location}<br>
-    <label>Ownership:</label> \${ownership}<br>
-    <label>Sprayer Type:</label> \${sprayerType}<br>
+    <div><span class="label">Job Number:</span> \${jobNumber}</div>
+    <div><span class="label">Date:</span> \${date}</div>
+    <div><span class="label">Company:</span> \${company}</div>
+    <div><span class="label">Client Address:</span> \${clientAddress}</div>
+    <div><span class="label">Location:</span> \${location}</div>
+    <div><span class="label">Ownership:</span> \${ownership}</div>
+    <div><span class="label">Sprayer Type:</span> \${sprayerType}</div>
   \`);
   newWindow.document.write('</div>');
 
-  newWindow.document.write('<div class="section"><h3>Time & Weather</h3>');
+  newWindow.document.write('<div class="section"><h3>Weather Conditions</h3>');
   newWindow.document.write(\`
-    <label>Start Time:</label> \${startTime}<br>
-    <label>End Time:</label> \${endTime}<br>
-    <label>Total Hours:</label> \${totalHours}<br>
-    <label>Hourly Rate:</label> $\${hourlyRate}<br>
-    <label>Labor Cost:</label> $\${laborCost}<br>
-    <label>Temperature:</label> \${temperature} °F<br>
-    <label>Humidity:</label> \${humidity} %<br>
-    <label>Wind Speed:</label> \${windSpeed} mph<br>
-    <label>Wind Direction:</label> \${windDirection}<br>
+    <div><span class="label">Temperature:</span> \${temperature} °F</div>
+    <div><span class="label">Humidity:</span> \${humidity} %</div>
+    <div><span class="label">Wind Speed:</span> \${windSpeed} mph</div>
+    <div><span class="label">Wind Direction:</span> \${windDirection}</div>
   \`);
   newWindow.document.write('</div>');
 
-  newWindow.document.write('<div class="section"><h3>Application Details</h3>');
+  newWindow.document.write('<div class="section"><h3>Timing & Labor</h3>');
   newWindow.document.write(\`
-    <label>Gallons Applied:</label> \${gallonsApplied}<br>
-    <label>Calibration Rate:</label> \${calibrationRate} gal/acre<br>
-    <label>Acres Treated:</label> \${acresTreated}<br>
+    <div><span class="label">Start Time:</span> \${startTime}</div>
+    <div><span class="label">End Time:</span> \${endTime}</div>
+    <div><span class="label">Total Hours:</span> \${totalHours}</div>
+    <div><span class="label">Hourly Rate:</span> $\${hourlyRate}</div>
+    <div><span class="label">Labor Cost:</span> $\${laborCost}</div>
   \`);
   newWindow.document.write('</div>');
 
-  newWindow.document.write('<div class="section"><h3>Herbicide / Adjuvant Usage</h3><table>');
-  newWindow.document.write('<tr><th>Chemical</th><th>Ounces per Acre</th><th>Total Used (oz)</th></tr>');
+  newWindow.document.write('<div class="section"><h3>Spray Application Details</h3>');
+  newWindow.document.write(\`
+    <div><span class="label">Gallons Applied:</span> \${gallonsApplied}</div>
+    <div><span class="label">Calibration Rate:</span> \${calibrationRate} gal/acre</div>
+    <div><span class="label">Acres Treated:</span> \${acresTreated}</div>
+  \`);
+  newWindow.document.write('</div>');
+
+  newWindow.document.write('<div class="section"><h3>Chemicals Used</h3><table><tr><th>Chemical</th><th>Ounces per Acre</th><th>Total Used (oz)</th></tr>');
   if (mix) {
     let i = 1;
     while (mix[\`Chemical\${i}\`] || mix[\`Amount\${i}\`]) {
@@ -446,25 +450,22 @@ function submitForm() {
   }
   newWindow.document.write('</table></div>');
 
-  newWindow.document.write('<div class="section"><h3>Additional Info</h3>');
+  newWindow.document.write('<div class="section"><h3>Other</h3>');
   newWindow.document.write(\`
-    <label>Applicators:</label> \${applicators}<br>
-    <label>GPS Coordinates:</label> \${gps}<br>
+    <div><span class="label">Applicators:</span> \${applicators}</div>
+    <div><span class="label">GPS Coordinates:</span> \${gps}</div>
   \`);
   newWindow.document.write('</div>');
 
   newWindow.document.write('<div class="signature"><h3>Signature</h3>');
   newWindow.document.write('<img src="' + signaturePad.toDataURL() + '" style="width:300px; border:1px solid #000;" /></div>');
-  newWindow.document.write('<p>Licensed by the Colorado Department of Agriculture</p>');
+
   newWindow.document.write('</body></html>');
 
-  // Save job number
   const jobInput = document.getElementById("jobNumber");
   let nextJob = parseInt(jobInput.value) + 1;
   jobInput.value = nextJob;
   localStorage.setItem("jobNumber", nextJob);
-
-  // Reset only signature
   clearSignature();
 }
 
