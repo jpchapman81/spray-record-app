@@ -31,10 +31,19 @@
     <option value="Other">Other</option>
   </select>
 
+  <label>Company:</label>
+  <select id="company" onchange="handleCompanyChange()" required>
+    <option value="">Loading companies...</option>
+    <option value="Other">Other</option>
+  </select>
+
   <div id="customCompanyContainer" style="display:none;">
-    <label>Enter Custom Company Name:</label>
+    <label>Custom Company Name:</label>
     <input type="text" id="customCompany">
   </div>
+
+  <label>Client Address:</label>
+  <input type="text" id="clientAddress" required>
 
   <label>Location:</label>
   <input type="text" id="location" required>
@@ -91,14 +100,43 @@
 </form>
 
 <script>
-function toggleCustomCompany() {
-  const companySelect = document.getElementById("company");
+let companyList = [];
+
+fetch("https://opensheet.elk.sh/18G6oH9M5SrvJ2gCRLXQgvqB_8KO4qcYL5dUNZtw4VnM/Companies")
+  .then(res => res.json())
+  .then(data => {
+    companyList = data;
+    const companySelect = document.getElementById("company");
+    companySelect.innerHTML = '<option value="">Select Company</option>';
+    
+    data.forEach(row => {
+      const opt = document.createElement("option");
+      opt.value = row["Company Name"];
+      opt.textContent = row["Company Name"];
+      companySelect.appendChild(opt);
+    });
+
+    // Always include "Other" at the end
+    const otherOpt = document.createElement("option");
+    otherOpt.value = "Other";
+    otherOpt.textContent = "Other";
+    companySelect.appendChild(otherOpt);
+  });
+
+function handleCompanyChange() {
+  const selected = document.getElementById("company").value;
   const customContainer = document.getElementById("customCompanyContainer");
-  if (companySelect.value === "Other") {
+  const addressInput = document.getElementById("clientAddress");
+
+  if (selected === "Other") {
     customContainer.style.display = "block";
+    addressInput.value = '';
+    addressInput.readOnly = false;
   } else {
     customContainer.style.display = "none";
-    document.getElementById("customCompany").value = "";
+    const row = companyList.find(c => c["Company Name"] === selected);
+    addressInput.value = row ? row.Address : '';
+    addressInput.readOnly = true;
   }
 }
 
