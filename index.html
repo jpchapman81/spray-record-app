@@ -198,6 +198,14 @@
 </form>
 
 <script>
+
+// Load last job number or start at 1000
+window.addEventListener("DOMContentLoaded", () => {
+  const savedJobNumber = localStorage.getItem("jobNumber");
+  const jobInput = document.getElementById("jobNumber");
+  jobInput.value = savedJobNumber ? parseInt(savedJobNumber) : 1000;
+});
+
 let companyList = [];
 
 fetch("https://opensheet.elk.sh/18G6oH9M5SrvJ2gCRLXQgvqB_8KO4qcYL5dUNZtw4VnM/Companies")
@@ -317,8 +325,10 @@ function submitForm() {
   newWindow.document.write('</div></body></html>');
 
    // Increment job number
-   const jobInput = document.getElementById("jobNumber");
-   jobInput.value = parseInt(jobInput.value) + 1;
+  const jobInput = document.getElementById("jobNumber");
+  let nextJob = parseInt(jobInput.value) + 1;
+  jobInput.value = nextJob;
+  localStorage.setItem("jobNumber", nextJob);
 
    // Clear only the signature
    clearSignature();
