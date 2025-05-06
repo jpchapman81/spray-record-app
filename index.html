@@ -291,15 +291,23 @@ const signaturePad = (() => {
 })();
 
 function submitForm() {
+  // Grab values properly
+  const jobNumber = document.getElementById("jobNumber").value;
+  const date = document.getElementById("date").value;
+
   const companySelect = document.getElementById("company").value;
   const customCompany = document.getElementById("customCompany").value;
   const company = companySelect === "Other" ? (customCompany || "Other") : companySelect;
-  const ownership = document.getElementById("ownership").value;
-  const sprayer = document.getElementById("sprayerType").value;
-  const rate = parseInt(document.getElementById("calibrationRate").value, 10);
-  const gallons = parseInt(document.getElementById("gallonsApplied").value, 10);
-  const acresTreated = (gallons / rate).toFixed(2);
 
+  const clientAddress = document.getElementById("clientAddress").value;
+  const location = document.getElementById("location").value;
+  const ownership = document.getElementById("ownership").value;
+  const sprayerType = document.getElementById("sprayerType").value;
+  const gallonsApplied = parseInt(document.getElementById("gallonsApplied").value, 10);
+  const calibration = parseInt(document.getElementById("calibrationRate").value, 10);
+  const acresTreated = (gallonsApplied / calibration).toFixed(2);
+
+  // Create print window
   const newWindow = window.open('', '', 'width=800,height=1000');
   newWindow.document.write('<html><head><title>Julius Ag Application Record</title></head><body>');
   newWindow.document.write('<div class="print-record">');
@@ -324,15 +332,15 @@ function submitForm() {
 
   newWindow.document.write('</div></body></html>');
 
-   // Increment job number
-  const jobInput = document.getElementById("jobNumber");
-  let nextJob = parseInt(jobInput.value) + 1;
-  jobInput.value = nextJob;
+  // Increment and save job number
+  let nextJob = parseInt(jobNumber) + 1;
+  document.getElementById("jobNumber").value = nextJob;
   localStorage.setItem("jobNumber", nextJob);
 
-   // Clear only the signature
-   clearSignature();
+  // Clear only the signature
+  clearSignature();
 }
+
 
   function clearForm() {
     const jobNumber = document.getElementById("jobNumber").value;
